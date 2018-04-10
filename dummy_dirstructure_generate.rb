@@ -2,6 +2,7 @@
 debug = true
 harmless = true
 testrun = true
+attached = false
 
 # === INITS ===
 dir_list = Hash.new
@@ -31,7 +32,7 @@ unless testrun
           puts "\nExcellent. That seems like a good starting place.\n"
           break
         else
-          puts "I can't find that directory. Make sure to give me the correct path (no escapes necessary):"
+          puts "I can't find that directory. Make sure to give me the correct absolute path (no escapes necessary):"
         end
       end
 
@@ -48,8 +49,12 @@ unless testrun
     end
   end
 else
-  new_parent = "testrundir"
-  mod_parent = "/media/jebrii/MAC OS Storage/Vengeance copy/"
+  new_parent = ".testrundir"
+  if attached
+    mod_parent = "/media/jebrii/MAC OS Storage/Vengeance copy/"
+  else
+    mod_parent = "../../"
+  end
   max_iter = 24
 end
 
@@ -67,9 +72,16 @@ until done
   puts "level #{level}" if debug
   puts current_dir if debug
   puts dir_list if debug
+  puts ""
 
-  Dir.each_child(current_dir) do |x|
-    puts x
+  Dir.foreach(current_dir) do |x|
+    if File.directory?(x)
+      puts "#{x} is a directory."
+    elsif File.file?(x)
+      puts "#{x} is a file."
+    else
+      puts "I don't know what to make of #{x}"
+    end
   end
 
   done = true
