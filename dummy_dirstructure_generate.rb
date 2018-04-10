@@ -1,8 +1,8 @@
 # === DEBUG STUFF ===
 debug = true
-harmless = true
+harmless = false
 testrun = true
-attached = false
+attached = true
 
 # === INITS ===
 dir_list = Hash.new
@@ -49,42 +49,56 @@ unless testrun
     end
   end
 else
-  new_parent = ".testrundir"
+  new_parent = "/home/jebrii/jdev/projects/project-blackberry-bush/.testrundir"
   if attached
-    mod_parent = "/media/jebrii/MAC OS Storage/Vengeance copy/"
+    mod_parent = "/media/jebrii/MAC OS Storage/Vengeance copy"
   else
-    mod_parent = "../../"
+    mod_parent = "../.."
   end
   max_iter = 24
 end
 
-puts new_parent if debug
-puts mod_parent if debug
-puts max_iter if debug
-puts "" if debug
-
 # === EXECUTION ===
 current_dir = mod_parent
-level = 1
+level = 0
+count = 0
 done = false
 
 until done
-  puts "level #{level}" if debug
-  puts current_dir if debug
-  puts dir_list if debug
-  puts ""
-
+  count += 1
   Dir.foreach(current_dir) do |x|
-    if File.directory?(x)
-      puts "#{x} is a directory."
-    elsif File.file?(x)
+    if x[0] == "."
+      puts "Skipping #{x}"
+      next
+    end
+    if File.directory?("#{current_dir}/#{x}")
+      puts "#{x} is a directory at level #{level + 1}"
+      dir_list["#{current_dir}/#{x}"] = level + 1
+      puts "Making new directory: #{new_parent}/#{x}"
+      Dir.mkdir("#{new_parent}/#{x}") unless harmless
+    elsif File.file?("#{current_dir}/#{x}")
       puts "#{x} is a file."
+      f = File.open("#{new_parent}/#{x}","w") unless harmless
+      f.close unless harmless
     else
       puts "I don't know what to make of #{x}"
     end
   end
 
-  done = true
+  puts "\ncount: #{count}" if debug
+  puts "\nlevel #{level}" if debug
+  puts "\n#{current_dir}" if debug
+  puts "\n#{dir_list}" if debug
+  puts ""
+
+  dir_list.delete(current_dir)
+  if dir_list.empty?
+    done = true
+  else
+    current_dir = dir_list.keys[0]
+    level = dir_list.values[0]
+    puts "Changing current_dir to #{current_dir}" if debug
+  end
 end
 
   # while dir_list.length() > 0
