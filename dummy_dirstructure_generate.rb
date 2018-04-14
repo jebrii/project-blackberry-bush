@@ -69,15 +69,13 @@ else
 end
 
 # === EXECUTION ===
-
 current_dir = mod_parent
 new_dir = new_parent
 dir_stem = ""
 level = 0
 count = 0
-done = false
 
-until done
+while true
   count += 1
   Dir.foreach(current_dir) do |x|
     if x[0] == "."
@@ -97,7 +95,6 @@ until done
       puts "#{x} is a file."
       f = File.open("#{new_dir}/#{x}","w") unless harmless
       f.close unless harmless
-
     else
       puts "I don't know what to make of #{x}"
     end
@@ -111,7 +108,7 @@ until done
 
   dir_list.delete(current_dir)
   if dir_list.empty?
-    done = true
+    break
   else
     current_dir = dir_list.keys[0]
     puts "Changing current_dir to #{current_dir}" if debug
